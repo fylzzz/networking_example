@@ -131,7 +131,7 @@ void RunServer()
 
 		// see if there are any inbound network events, wait up to 1000ms before returning.
 		// if the server also did game logic, this timeout should be lowered
-		if (enet_host_service(server, &event, 100) > 0)
+		if (enet_host_service(server, &event, 0) > 0)
 		{
 			// see what kind of event we have
 			switch (event.type)
