@@ -155,6 +155,11 @@ void DrawGame()
 
 	case Connecting:
 		DrawText("Connecting...", 0, 20, 20, DARKGREEN);
+		if (GuiButton((Rectangle) { 0, 70, 40, 20 }, "Host Server")) {
+			StartListenServer();
+			WaitTime(0.1);
+			Connect("127.0.0.1");
+		}
 		if (GuiTextBox((Rectangle) { 0, 45, 200, 20 }, defaultIP, 20, textEditMode)) {
 			textEditMode = !textEditMode;
 		}
@@ -194,11 +199,11 @@ int main()
 	SetTargetFPS(60);
 
 	// start listen server on separate thread
-	StartListenServer();
-	WaitTime(0.1);
+	//StartListenServer();
+	//WaitTime(0.1);
 
 	// if you want to connect to a server on another machine, change this, or ask the user for the server address
-	Connect(defaultIP);
+	//Connect(defaultIP);
 	State = Connecting;
 
 	while (RunGame)
