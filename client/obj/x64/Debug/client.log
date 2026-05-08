@@ -1,4 +1,5 @@
-﻿  net_client.c
+﻿  client.c
+  net_client.c
 C:\Users\iChoc\Documents\GitHub\networking_example\networking\include\enet.h(1880,104): warning C5287: operands are different enum types '_ENetProtocolCommand' and '_ENetProtocolFlag'; use an explicit cast to silence this warning
   (compiling source file 'net_client.c')
   
@@ -26,4 +27,5 @@ C:\Users\iChoc\Documents\GitHub\networking_example\networking\include\enet.h(458
 C:\Users\iChoc\Documents\GitHub\networking_example\networking\include\enet.h(4864,82): warning C5287: operands are different enum types '_ENetProtocolCommand' and '_ENetProtocolFlag'; use an explicit cast to silence this warning
   (compiling source file 'net_client.c')
   
+  Generating Code...
   client.vcxproj -> C:\Users\iChoc\Documents\GitHub\networking_example\bin\Debug\client.exe
