@@ -29,13 +29,20 @@
 //This is the client main for a simple networking game (max 8 players)
 // it starts up a graphical client, connects to a server and runs the game, showing all players
 
+#define _CRT_SECURE_NO_WARNINGS
+
 // include raylib
 #include "raylib.h"
+#define RAYGUI_IMPLEMENTATION
+#include "raygui.h"
 
 // include the networking interface
 // we can't directly include networking in any file that uses raylib.h, so we abstract out the network gameplay to it's own file
 #include "net_listenclient.h"
 #include "net_constants.h"
+
+char defaultIP[128] = "Enter IP Address";
+bool textEditMode = false;
 
 // a list of predefined colors based on the player lost
 static Color PlayerColors[MAX_PLAYERS] = { 0 };
@@ -108,7 +115,7 @@ void UpdateGame()
 		else if (!Connected())
 		{
 			// we got booted, reconnect
-			Connect("127.0.0.1");
+			Connect(defaultIP);
 			State = Connecting;
 		}
 		else
@@ -148,6 +155,12 @@ void DrawGame()
 
 	case Connecting:
 		DrawText("Connecting...", 0, 20, 20, DARKGREEN);
+		if (GuiTextBox((Rectangle) { 0, 45, 200, 20 }, defaultIP, 20, textEditMode)) {
+			textEditMode = !textEditMode;
+		}
+		if (IsKeyPressed(KEY_ENTER) && strlen(defaultIP) > 0) {
+			Connect(defaultIP);
+		}
 		break;
 
 	case Disconnecting:
@@ -177,7 +190,7 @@ int main()
 	SetColors();
 
 	// set up raylib
-	InitWindow(FieldSizeWidth, FieldSizeHeight, "Client");
+	InitWindow(FieldSizeWidth, FieldSizeHeight, "ListenClient");
 	SetTargetFPS(60);
 
 	// start listen server on separate thread
@@ -185,7 +198,7 @@ int main()
 	WaitTime(0.1);
 
 	// if you want to connect to a server on another machine, change this, or ask the user for the server address
-	Connect("127.0.0.1");
+	Connect(defaultIP);
 	State = Connecting;
 
 	while (RunGame)

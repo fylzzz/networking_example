@@ -102,7 +102,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>.;src;include;..\raylib-master\src;..\raylib-master\src\external;..\raylib-master\src\external\glfw\include;..\networking\include;..\networking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;src;include;..\raylib-master\src;..\raylib-master\src\external;..\raylib-master\src\external\glfw\include;..\listen\include;..\networking\include;..\networking;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -139,6 +139,7 @@ shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
   <ItemGroup>
     <ClInclude Include="..\listen\listenserver.h" />
     <ClInclude Include="..\listen\net_listenclient.h" />
+    <ClInclude Include="raygui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

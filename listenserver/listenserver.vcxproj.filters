@@ -35,5 +35,8 @@
     <ClInclude Include="..\listen\net_listenclient.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="raygui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
