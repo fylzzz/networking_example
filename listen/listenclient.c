@@ -155,7 +155,7 @@ void DrawGame()
 
 	case Connecting:
 		DrawText("Connecting...", 0, 20, 20, DARKGREEN);
-		if (GuiButton((Rectangle) { 0, 70, 40, 20 }, "Host Server")) {
+		if (GuiButton((Rectangle) { 0, 70, 40, 20 }, "Host")) {
 			StartListenServer();
 			WaitTime(0.1);
 			Connect("127.0.0.1");
@@ -163,7 +163,7 @@ void DrawGame()
 		if (GuiTextBox((Rectangle) { 0, 45, 200, 20 }, defaultIP, 20, textEditMode)) {
 			textEditMode = !textEditMode;
 		}
-		if (IsKeyPressed(KEY_ENTER) && strlen(defaultIP) > 0) {
+		if (GuiButton((Rectangle) { 45, 70, 40, 20}, "Join") && strlen(defaultIP) > 0) {
 			Connect(defaultIP);
 		}
 		break;
