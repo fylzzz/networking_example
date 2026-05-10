@@ -138,6 +138,10 @@ void UpdateGame()
 			// tell the network game play client that we moved
 			// it will update the local simulation and cache the data until the next network tick time
 			UpdateLocalPlayer(&movement, GetFrameTime());
+
+			if (IsKeyPressed(KEY_SPACE)) {
+				SpawnLocalBullet();
+			}
 		}
 		break;
 	}
@@ -185,6 +189,14 @@ void DrawGame()
 				DrawRectangle((int)pos.x, (int)pos.y, PlayerSize, PlayerSize, PlayerColors[i]);
 			}
 		}
+
+		for (int i = 0; i < MAX_BULLETS; i++)
+		{
+			Vector2 pos = { 0 };
+			if (GetBulletPos(i, &pos))
+				DrawCircle((int)pos.x, (int)pos.y, 5, PlayerColors[i]);
+		}
+
 		break;
 	}
 }

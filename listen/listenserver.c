@@ -56,6 +56,14 @@ typedef struct
 	int16_t DY;
 }PlayerInfo;
 
+typedef struct {
+	int id;
+	int ownerID;
+	float x, y;
+	float velX, velY;
+	bool active;
+} BulletState;
+
 static volatile bool serverRunning = false;
 
 
@@ -63,6 +71,8 @@ static volatile bool serverRunning = false;
 // this is the server state of the game that represents the current game state
 // this is what server code would check to see where all the players are and what they are doing
 PlayerInfo ServerPlayers[MAX_PLAYERS] = { 0 };
+
+BulletState ServerBullets[MAX_BULLETS] = { 0 };
 
 void StopServer() {
 	serverRunning = false;
@@ -261,6 +271,33 @@ void RunServer()
 
 					// NOTE enet_host_service will handle releasing send packets when the network system has finally sent them,
 					// you don't have to destroy them
+				}
+				else if (command == SpawnBullet) {
+					// server assigns the ID, don't trust the client to pick one
+					int bulletId = -1;
+					for (int i = 0; i < MAX_BULLETS; i++) {
+						if (!ServerBullets[i].active) { bulletId = i; break; }
+					}
+					if (bulletId == -1) break;  // no free slots, ignore
+
+					ServerBullets[bulletId].ownerID = playerId;
+					ServerBullets[bulletId].x = ReadShort(event.packet, &offset);
+					ServerBullets[bulletId].y = ReadShort(event.packet, &offset);
+					ServerBullets[bulletId].velX = ReadShort(event.packet, &offset);
+					ServerBullets[bulletId].velY = ReadShort(event.packet, &offset);
+					ServerBullets[bulletId].active = true;
+
+					uint8_t buffer[10] = { 0 };
+					buffer[0] = (uint8_t)SpawnBullet;
+					buffer[1] = (uint8_t)bulletId;
+					*(int16_t*)(buffer + 2) = (int16_t)ServerBullets[bulletId].x;
+					*(int16_t*)(buffer + 4) = (int16_t)ServerBullets[bulletId].y;
+					*(int16_t*)(buffer + 6) = (int16_t)ServerBullets[bulletId].velX;
+					*(int16_t*)(buffer + 8) = (int16_t)ServerBullets[bulletId].velY;
+
+					ENetPacket* packet = enet_packet_create(buffer, 10, ENET_PACKET_FLAG_RELIABLE);
+					enet_host_broadcast(server, 0, packet);
+					
 				}
 
 				// tell enet that it can recycle the inbound packet

@@ -85,11 +85,24 @@ typedef struct
 	Vector2 ExtrapolatedPosition;
 }RemotePlayer;
 
+typedef struct {
+	bool Active;
+
+	Vector2 Position;
+
+	Vector2 Direction;
+
+	double UpdateTime;
+
+	Vector2 ExtrapolatedPosition;
+} RemoteBullet;
+
 // The list of all possible players
 // this is the local simulation that represents the current game state
 // it includes the current local player and the last known data from all remote players
 // the client checks this every frame to see where everyone is on the field
 RemotePlayer Players[MAX_PLAYERS] = { 0 };
+RemoteBullet Bullets[MAX_BULLETS] = { 0 };
 
 // Start server when serverThread is created
 DWORD WINAPI ServerThreadFunc(LPVOID arg) {
@@ -208,6 +221,18 @@ void HandleUpdatePlayer(ENetPacket* packet, size_t* offset)
 	// what the input state was so the local simulation could do prediction and smooth out the motion
 }
 
+void HandleSpawnBullet(ENetPacket* packet, size_t* offset)
+{
+	int bulletId = ReadByte(packet, offset);
+	if (bulletId < 0 || bulletId >= MAX_BULLETS)
+		return;
+
+	Bullets[bulletId].Active = true;
+	Bullets[bulletId].Position = ReadPosition(packet, offset);
+	Bullets[bulletId].Direction = ReadPosition(packet, offset);
+	Bullets[bulletId].UpdateTime = LastNow;
+}
+
 // process one frame of updates
 void Update(double now, float deltaT)
 {
@@ -312,6 +337,10 @@ void Update(double now, float deltaT)
 				case UpdatePlayer:
 					HandleUpdatePlayer(Event.packet, &offset);
 					break;
+				
+				case SpawnBullet:
+					HandleSpawnBullet(Event.packet, &offset);
+					break;
 				}
 			}
 			// tell enet that it can recycle the packet data
@@ -348,6 +377,14 @@ void Update(double now, float deltaT)
 			continue;
 		double delta = LastNow - Players[i].UpdateTime;
 		Players[i].ExtrapolatedPosition = Vector2Add(Players[i].Position, Vector2Scale(Players[i].Direction, (float)delta));
+	}
+
+	for (int i = 0; i < MAX_BULLETS; i++)
+	{
+		if (!Bullets[i].Active)
+			continue;
+		double delta = LastNow - Bullets[i].UpdateTime;
+		Bullets[i].ExtrapolatedPosition = Vector2Add(Bullets[i].Position, Vector2Scale(Bullets[i].Direction, (float)delta));
 	}
 }
 
@@ -398,6 +435,31 @@ void UpdateLocalPlayer(Vector2* movementDelta, float deltaT)
 		Players[LocalPlayerId].Position.y = FieldSizeHeight - PlayerSize;
 
 	Players[LocalPlayerId].Direction = *movementDelta;
+}
+
+void SpawnLocalBullet() {
+	if (LocalPlayerId < 0)
+		return;
+
+	// pack the spawn request — server will assign the bullet ID
+	uint8_t buffer[9] = { 0 };
+	buffer[0] = (uint8_t)SpawnBullet;
+	*(int16_t*)(buffer + 1) = (int16_t)Players[LocalPlayerId].Position.x;
+	*(int16_t*)(buffer + 3) = (int16_t)Players[LocalPlayerId].Position.y;
+	*(int16_t*)(buffer + 5) = (int16_t)Players[LocalPlayerId].Direction.x;
+	*(int16_t*)(buffer + 7) = (int16_t)Players[LocalPlayerId].Direction.y;
+
+	ENetPacket* packet = enet_packet_create(buffer, 9, ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(server, 0, packet);
+}
+
+bool GetBulletPos(int id, Vector2* pos)
+{
+	if (id < 0 || id >= MAX_BULLETS || !Bullets[id].Active)
+		return false;
+
+	*pos = Bullets[id].ExtrapolatedPosition;
+	return true;
 }
 
 // get the info for a particular player

@@ -39,6 +39,8 @@
 // how big a player is
 #define PlayerSize 10
 
+#define MAX_BULLETS 64
+
 // All the different commands that can be sent over the network
 typedef enum
 {
@@ -56,4 +58,7 @@ typedef enum
 
 	// Client -> Server, Provide an updated location for the client's player, contains the postion to update
 	UpdateInput = 5,
+
+	// Client -> Server, Add a ne bullet to the simulation
+	SpawnBullet = 6,
 }NetworkCommands;
