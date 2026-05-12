@@ -140,7 +140,7 @@ void UpdateGame()
 			UpdateLocalPlayer(&movement, GetFrameTime());
 
 			if (IsKeyPressed(KEY_SPACE)) {
-				SpawnLocalBullet();
+				SpawnLocalBullet(GetMousePosition());
 			}
 		}
 		break;
@@ -194,7 +194,7 @@ void DrawGame()
 		{
 			Vector2 pos = { 0 };
 			if (GetBulletPos(i, &pos))
-				DrawCircle((int)pos.x, (int)pos.y, 5, PlayerColors[i]);
+				DrawCircle((int)pos.x, (int)pos.y, 5, WHITE);
 		}
 
 		break;

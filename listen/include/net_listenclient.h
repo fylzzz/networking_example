@@ -53,7 +53,7 @@ bool Connected();
 // Tell the network game play how far we wanted to move this frame
 void UpdateLocalPlayer(Vector2* movementDelta, float deltaT);
 
-void SpawnLocalBullet();
+void SpawnLocalBullet(Vector2 cursorPos);
 bool GetBulletPos(int id, Vector2* pos);
 
 // get the id that the server assigned to us

@@ -1,2 +1,4 @@
 ﻿  listenclient.c
+  net_listenclient.c
+  Generating Code...
   listenserver.vcxproj -> C:\Users\iChoc\Documents\GitHub\networking_example\x64\Debug\listenserver.exe
