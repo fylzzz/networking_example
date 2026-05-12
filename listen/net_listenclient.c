@@ -449,8 +449,8 @@ void SpawnLocalBullet(Vector2 cursorPos) {
 	buffer[0] = (uint8_t)SpawnBullet;
 	*(int16_t*)(buffer + 1) = (int16_t)Players[LocalPlayerId].Position.x;
 	*(int16_t*)(buffer + 3) = (int16_t)Players[LocalPlayerId].Position.y;
-	*(int16_t*)(buffer + 5) = (int16_t)(dir.x * 100);
-	*(int16_t*)(buffer + 7) = (int16_t)(dir.y * 100);
+	*(int16_t*)(buffer + 5) = (int16_t)(dir.x * 200);
+	*(int16_t*)(buffer + 7) = (int16_t)(dir.y * 200);
 
 	ENetPacket* packet = enet_packet_create(buffer, 9, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(server, 0, packet);

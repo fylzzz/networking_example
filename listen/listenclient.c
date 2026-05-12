@@ -78,7 +78,7 @@ static void Quit()
 
 // how fast in pixels per second we can move
 // NOTE : the server should send us all this data in a real game
-static float MoveSpeed = 200;
+static float MoveSpeed = 100;
 
 void UpdateGame()
 {
@@ -125,21 +125,21 @@ void UpdateGame()
 			float speed = MoveSpeed;
 
 			// see what axes we move in
-			if (IsKeyDown(KEY_UP))
+			if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W))
 				movement.y -= speed;
-			if (IsKeyDown(KEY_DOWN))
+			if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S))
 				movement.y += speed;
 
-			if (IsKeyDown(KEY_LEFT))
+			if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A))
 				movement.x -= speed;
-			if (IsKeyDown(KEY_RIGHT))
+			if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D))
 				movement.x += speed;
 
 			// tell the network game play client that we moved
 			// it will update the local simulation and cache the data until the next network tick time
 			UpdateLocalPlayer(&movement, GetFrameTime());
 
-			if (IsKeyPressed(KEY_SPACE)) {
+			if (IsMouseButtonPressed(0)) {
 				SpawnLocalBullet(GetMousePosition());
 			}
 		}
