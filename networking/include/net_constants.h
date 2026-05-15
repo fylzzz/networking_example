@@ -59,6 +59,9 @@ typedef enum
 	// Client -> Server, Provide an updated location for the client's player, contains the postion to update
 	UpdateInput = 5,
 
-	// Client -> Server, Add a ne bullet to the simulation
+	// Client -> Server, Add a new bullet to the simulation
 	SpawnBullet = 6,
+
+	// 
+	DestroyBullet = 7,
 }NetworkCommands;

@@ -135,6 +135,8 @@ void RunServer()
 	// the server will run forever. If we wanted a way to stop it, we'd set run to false using some code
 	serverRunning = true;
 
+	enet_uint32 lastBulletUpdate = enet_time_get();
+
 	while (serverRunning)
 	{
 		ENetEvent event = { 0 };
@@ -336,6 +338,55 @@ void RunServer()
 
 			case ENET_EVENT_TYPE_NONE:
 				break;
+			}
+		}
+
+		enet_uint32 now = enet_time_get();
+		float deltaTime = (now - lastBulletUpdate) / 1000.0f;
+		lastBulletUpdate = now;
+
+		for (int i = 0; i < MAX_BULLETS; i++) {
+			if (!ServerBullets[i].active) continue;
+
+			ServerBullets[i].x += ServerBullets[i].velX * deltaTime;
+			ServerBullets[i].y += ServerBullets[i].velY * deltaTime;
+
+			bool destroy = false;
+
+			// check for oob
+			if (ServerBullets[i].x < 0 || ServerBullets[i].x > FieldSizeWidth ||
+				ServerBullets[i].y < 0 || ServerBullets[i].y > FieldSizeHeight)
+			{
+				destroy = true;
+			}
+
+			if (!destroy) {
+				for (int p = 0; p < MAX_PLAYERS; p++) {
+					if (!ServerPlayers[p].Active || p == ServerBullets[i].ownerID) continue;
+
+					float bx = ServerBullets[i].x;
+					float by = ServerBullets[i].y;
+					float px = (float)ServerPlayers[p].X;
+					float py = (float)ServerPlayers[p].Y;
+
+					if (bx >= px && bx <= px + PlayerSize &&
+						by >= py && by <= py + PlayerSize)
+					{
+						destroy = true;
+						break;
+					}
+				}
+			}
+
+			if (destroy) {
+				ServerBullets[i].active = false;
+
+				uint8_t buffer[2] = { 0 };
+				buffer[0] = (uint8_t)DestroyBullet;
+				buffer[1] = (uint8_t)i;
+
+				ENetPacket* packet = enet_packet_create(buffer, 2, ENET_PACKET_FLAG_RELIABLE);
+				enet_host_broadcast(server, 0, packet);
 			}
 		}
 	}

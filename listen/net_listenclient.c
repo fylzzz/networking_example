@@ -224,13 +224,20 @@ void HandleUpdatePlayer(ENetPacket* packet, size_t* offset)
 void HandleSpawnBullet(ENetPacket* packet, size_t* offset)
 {
 	int bulletId = ReadByte(packet, offset);
-	if (bulletId < 0 || bulletId >= MAX_BULLETS)
-		return;
+	if (bulletId < 0 || bulletId >= MAX_BULLETS) return;
 
 	Bullets[bulletId].Active = true;
 	Bullets[bulletId].Position = ReadPosition(packet, offset);
 	Bullets[bulletId].Direction = ReadPosition(packet, offset);
 	Bullets[bulletId].UpdateTime = LastNow;
+}
+
+void HandleDestroyBullet(ENetPacket* packet, size_t* offset)
+{
+	int bulletId = ReadByte(packet, offset);
+	if (bulletId < 0 || bulletId >= MAX_BULLETS) return;
+
+	Bullets[bulletId].Active = false;
 }
 
 // process one frame of updates
@@ -341,7 +348,11 @@ void Update(double now, float deltaT)
 				case SpawnBullet:
 					HandleSpawnBullet(Event.packet, &offset);
 					break;
+				case DestroyBullet:
+					HandleDestroyBullet(Event.packet, &offset);
+					break;
 				}
+
 			}
 			// tell enet that it can recycle the packet data
 			enet_packet_destroy(Event.packet);
