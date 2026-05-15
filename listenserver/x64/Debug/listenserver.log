@@ -1,18 +1,2 @@
-﻿  listenclient.c
-  listenserver.c
-  net_listenclient.c
-  net_common.c
-  PCG.c
-  perlin.c
-  Generating Code...
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\PCG.c(50,38): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\PCG.c(50,47): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(34,45): warning C4244: 'return': conversion from 'double' to 'float', possible loss of data
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(55,26): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(58,26): warning C4554: '>>': check operator precedence for possible error; use parentheses to clarify precedence
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(64,8): warning C4013: 'sin' undefined; assuming extern returning int
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(64,8): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(65,8): warning C4013: 'cos' undefined; assuming extern returning int
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(65,8): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-C:\Users\iChoc\Documents\GitHub\networking_example\listenserver\perlin.c(60,19): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+﻿  listenserver.c
   listenserver.vcxproj -> C:\Users\iChoc\Documents\GitHub\networking_example\x64\Debug\listenserver.exe

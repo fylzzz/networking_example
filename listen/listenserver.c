@@ -31,6 +31,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #define ENET_IMPLEMENTATION
 #include "net_common.h"
+#include "PCG_TYPES.h"
 
 #include <stdio.h>
 #include <stdint.h>
@@ -65,6 +66,9 @@ typedef struct {
 } BulletState;
 
 static volatile bool serverRunning = false;
+
+static uint8_t ServerMapData[1 + MAP_ROWS * MAP_COLUMNS] = { 0 };
+static bool ServerMapValid = false;
 
 
 // The list of all possible players
@@ -213,6 +217,16 @@ void RunServer()
 					// NOTE enet_host_service will handle releasing send packets when the network system has finally sent them,
 					// you don't have to destroy them
 				}
+
+				if (ServerMapValid) {
+					ENetPacket* packet = enet_packet_create(
+						ServerMapData,
+						1 + MAP_ROWS * MAP_COLUMNS,
+						ENET_PACKET_FLAG_RELIABLE
+					);
+					enet_peer_send(event.peer, 0, packet);
+				}
+
 				break;
 			}
 
@@ -303,7 +317,16 @@ void RunServer()
 					
 				}
 				else if (command == SyncMap) {
-					
+					memcpy(ServerMapData, event.packet->data, event.packet->dataLength);
+					ServerMapValid = true;
+
+					ENetPacket* packet = enet_packet_create(
+						event.packet->data,
+						event.packet->dataLength,
+						ENET_PACKET_FLAG_RELIABLE
+					);
+					SendToAllBut(packet, playerId);
+
 				}
 
 				// tell enet that it can recycle the inbound packet

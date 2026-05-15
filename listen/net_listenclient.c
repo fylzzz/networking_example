@@ -466,6 +466,8 @@ void UpdateLocalPlayer(Vector2* movementDelta, float deltaT)
 		Players[LocalPlayerId].Position.y = FieldSizeHeight - PlayerSize;
 
 	Players[LocalPlayerId].Direction = *movementDelta;
+
+
 }
 
 void SpawnLocalBullet(Vector2 cursorPos) {
