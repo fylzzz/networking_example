@@ -2,10 +2,11 @@
 #define PCG_H
 
 #include <raylib.h>
+#include "PCG_TYPES.h"
 
 // Defines
-#define SCREEN_WIDTH 1024
-#define SCREEN_HEIGHT 1024
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 800
 #define TILE_SIZE 64
 #define NOISE_SCALE 3.0f
 

@@ -35,6 +35,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "PCG_TYPES.h"
+
 // It is ok to include raymath, since raymath doesn't have any conflict with windows.h
 #include "raymath.h"
 
@@ -42,7 +44,7 @@
 void Connect(const char* serverAddress);
 
 // Process one frame of updates
-void Update(double now, float deltaT);
+void Update(double now, float deltaT, TileType _tileArray[MAP_ROWS][MAP_COLUMNS]);
 
 // Disconnect from the server
 void Disconnect();
@@ -59,9 +61,13 @@ bool GetBulletPos(int id, Vector2* pos, int* ownerId);
 // get the id that the server assigned to us
 int GetLocalPlayerId();
 
+void SendMapSync(TileType _tileArray[MAP_ROWS][MAP_COLUMNS]);
+
 // get the position info for a player from the local simulation that has the latest network data in it
 // returns false if the player id is not valid
 bool GetPlayerPos(int id, Vector2* pos);
+
+bool IsHost();
 
 void StartListenServer();
 

@@ -302,6 +302,9 @@ void RunServer()
 					enet_host_broadcast(server, 0, packet);
 					
 				}
+				else if (command == SyncMap) {
+					
+				}
 
 				// tell enet that it can recycle the inbound packet
 				enet_packet_destroy(event.packet);

@@ -27,6 +27,12 @@
     <ClCompile Include="..\networking\net_common.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PCG.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="perlin.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\listen\listenserver.h">
@@ -36,6 +42,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="raygui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PCG.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="perlin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="resource_dir.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PCG_TYPES.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

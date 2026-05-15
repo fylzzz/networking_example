@@ -2,11 +2,11 @@
 
 #include "PCG.h"
 #include "perlin.h"
-#include "save_dialog.h"
+//#include "save_dialog.h"
 #include <stdio.h>
 
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+//#define RAYGUI_IMPLEMENTATION
+//#include "raygui.h"
 
 static float s_offsetX = 0.0f;
 static float s_offsetY = 0.0f;
@@ -90,7 +90,7 @@ char GetTileChar(TileType tileType) {
 // =============================================
 // PCG_SaveMapData
 // =============================================
-void PCG_SaveMapData(TileType _tileArray[MAP_ROWS][MAP_COLUMNS], const char* fileName) {
+/*void PCG_SaveMapData(TileType _tileArray[MAP_ROWS][MAP_COLUMNS], const char* fileName) {
     char filePath[260] = "";
 
     if (!ShowSaveDialog(filePath, sizeof(filePath), fileName)) {
@@ -168,4 +168,4 @@ void PCG_DrawGUI(TileType _tileArray[MAP_ROWS][MAP_COLUMNS]) {
     if (GuiButton(loadRect, "Load Map")) {
         PCG_LoadMapData(_tileArray, MAP_FILE_NAME);
     }
-}
+}*/

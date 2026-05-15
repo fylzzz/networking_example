@@ -40,12 +40,15 @@
 // we can't directly include networking in any file that uses raylib.h, so we abstract out the network gameplay to it's own file
 #include "net_listenclient.h"
 #include "net_constants.h"
+#include "PCG.h"
 
 char defaultIP[128] = "Enter IP Address";
 bool textEditMode = false;
 
 // a list of predefined colors based on the player lost
 static Color PlayerColors[MAX_PLAYERS] = { 0 };
+
+TileType tileArray[MAP_ROWS][MAP_COLUMNS] = { 0 };
 
 void SetColors()
 {
@@ -84,7 +87,7 @@ void UpdateGame()
 {
 	// let the network game system update
 	// this will process any inbound events and update the local simulation
-	Update(GetTime(), GetFrameTime());
+	Update(GetTime(), GetFrameTime(), tileArray);
 
 	switch (State)
 	{
@@ -94,9 +97,11 @@ void UpdateGame()
 		break;
 
 	case Connecting:
-		if (Connected() && GetLocalPlayerId() >= 0)
+		if (Connected() && GetLocalPlayerId() >= 0) {
 			State = Playing;
-
+			if (IsHost())
+				SendMapSync(tileArray);
+		}
 		break;
 
 	case Disconnecting:
@@ -177,6 +182,8 @@ void DrawGame()
 		break;
 
 	case Playing:
+		PCG_DrawMap(tileArray, false);
+
 		// we are connected, and know what our player ID is, so show that to the player in our color
 		DrawText(TextFormat("Player %d", GetLocalPlayerId()), 0, 20, 20, PlayerColors[GetLocalPlayerId()]);
 
@@ -210,6 +217,8 @@ int main()
 	// set up raylib
 	InitWindow(FieldSizeWidth, FieldSizeHeight, "ListenClient");
 	SetTargetFPS(60);
+
+	PCG_CreateMap(tileArray);
 
 	// start listen server on separate thread
 	//StartListenServer();

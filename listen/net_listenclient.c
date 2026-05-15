@@ -32,6 +32,8 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <windows.h>
 
+#include "PCG.h"
+
 #include "net_common.h"
 #include "listenserver.h"
 #include "net_listenclient.h"
@@ -245,8 +247,16 @@ void HandleDestroyBullet(ENetPacket* packet, size_t* offset)
 	Bullets[bulletId].Active = false;
 }
 
+void HandleSyncMap(ENetPacket* packet, size_t* offset, TileType _tileArray[MAP_ROWS][MAP_COLUMNS]) {
+	for (int y = 0; y < MAP_ROWS; y++) {
+		for (int x = 0; x < MAP_COLUMNS; x++) {
+			_tileArray[y][x] = (TileType)ReadByte(packet, offset);
+		}
+	}
+}
+
 // process one frame of updates
-void Update(double now, float deltaT)
+void Update(double now, float deltaT, TileType _tileArray[MAP_ROWS][MAP_COLUMNS])
 {
 	LastNow = now;
 	// if we are not connected to anything yet, we can't do anything, so bail out early
@@ -353,8 +363,13 @@ void Update(double now, float deltaT)
 				case SpawnBullet:
 					HandleSpawnBullet(Event.packet, &offset);
 					break;
+
 				case DestroyBullet:
 					HandleDestroyBullet(Event.packet, &offset);
+					break;
+
+				case SyncMap:
+					HandleSyncMap(Event.packet, &offset, _tileArray);
 					break;
 				}
 
@@ -472,6 +487,22 @@ void SpawnLocalBullet(Vector2 cursorPos) {
 	enet_peer_send(server, 0, packet);
 }
 
+void SendMapSync(TileType _tileArray[MAP_ROWS][MAP_COLUMNS]) {
+	int tileCount = MAP_ROWS * MAP_COLUMNS;
+	int bufferSize = 1 + tileCount;
+
+	uint8_t* buffer = (uint8_t*)malloc(bufferSize);
+	buffer[0] = (uint8_t)SyncMap;
+
+	for (int y = 0; y < MAP_ROWS; y++)
+		for (int x = 0; x < MAP_COLUMNS; x++)
+			buffer[1 + y * MAP_COLUMNS + x] = (uint8_t)_tileArray[y][x];
+
+	ENetPacket* packet = enet_packet_create(buffer, bufferSize, ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(server, 0, packet);
+	free(buffer);
+}
+
 bool GetBulletPos(int id, Vector2* pos, int* ownerId)
 {
 	if (id < 0 || id >= MAX_BULLETS || !Bullets[id].Active)
@@ -495,4 +526,8 @@ bool GetPlayerPos(int id, Vector2* pos)
 	else
 		*pos = Players[id].ExtrapolatedPosition;
 	return true;
+}
+
+bool IsHost() {
+	return serverThread != NULL;
 }
