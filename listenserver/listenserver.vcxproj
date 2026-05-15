@@ -135,10 +135,12 @@ shell32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     <ClCompile Include="..\listen\listenserver.c" />
     <ClCompile Include="..\listen\net_listenclient.c" />
     <ClCompile Include="..\networking\net_common.c" />
+    <ClCompile Include="PCG.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\listen\listenserver.h" />
     <ClInclude Include="..\listen\net_listenclient.h" />
+    <ClInclude Include="PCG.h" />
     <ClInclude Include="raygui.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

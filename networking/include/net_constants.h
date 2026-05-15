@@ -64,4 +64,6 @@ typedef enum
 
 	// 
 	DestroyBullet = 7,
+
+	SyncMap = 8,
 }NetworkCommands;
