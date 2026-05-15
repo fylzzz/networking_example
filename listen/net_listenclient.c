@@ -32,7 +32,7 @@
 #define _WINSOCK_DEPRECATED_NO_WARNINGS
 #include <windows.h>
 
-#include "PCG.h"
+#include "PCG_TYPES.h"
 
 #include "net_common.h"
 #include "listenserver.h"
