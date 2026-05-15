@@ -289,15 +289,16 @@ void RunServer()
 					ServerBullets[bulletId].velY = ReadShort(event.packet, &offset);
 					ServerBullets[bulletId].active = true;
 
-					uint8_t buffer[10] = { 0 };
+					uint8_t buffer[11] = { 0 };
 					buffer[0] = (uint8_t)SpawnBullet;
 					buffer[1] = (uint8_t)bulletId;
-					*(int16_t*)(buffer + 2) = (int16_t)ServerBullets[bulletId].x;
-					*(int16_t*)(buffer + 4) = (int16_t)ServerBullets[bulletId].y;
-					*(int16_t*)(buffer + 6) = (int16_t)ServerBullets[bulletId].velX;
-					*(int16_t*)(buffer + 8) = (int16_t)ServerBullets[bulletId].velY;
+					buffer[2] = (uint8_t)ServerBullets[bulletId].ownerID;
+					*(int16_t*)(buffer + 3) = (int16_t)ServerBullets[bulletId].x;
+					*(int16_t*)(buffer + 5) = (int16_t)ServerBullets[bulletId].y;
+					*(int16_t*)(buffer + 7) = (int16_t)ServerBullets[bulletId].velX;
+					*(int16_t*)(buffer + 9) = (int16_t)ServerBullets[bulletId].velY;
 
-					ENetPacket* packet = enet_packet_create(buffer, 10, ENET_PACKET_FLAG_RELIABLE);
+					ENetPacket* packet = enet_packet_create(buffer, 11, ENET_PACKET_FLAG_RELIABLE);
 					enet_host_broadcast(server, 0, packet);
 					
 				}

@@ -193,8 +193,9 @@ void DrawGame()
 		for (int i = 0; i < MAX_BULLETS; i++)
 		{
 			Vector2 pos = { 0 };
-			if (GetBulletPos(i, &pos))
-				DrawCircle((int)pos.x, (int)pos.y, 5, WHITE);
+			int ownerId = 0;
+			if (GetBulletPos(i, &pos, &ownerId))
+				DrawCircle((int)pos.x, (int)pos.y, 5, PlayerColors[ownerId]);
 		}
 
 		break;

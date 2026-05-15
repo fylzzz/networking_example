@@ -54,7 +54,7 @@ bool Connected();
 void UpdateLocalPlayer(Vector2* movementDelta, float deltaT);
 
 void SpawnLocalBullet(Vector2 cursorPos);
-bool GetBulletPos(int id, Vector2* pos);
+bool GetBulletPos(int id, Vector2* pos, int* ownerId);
 
 // get the id that the server assigned to us
 int GetLocalPlayerId();

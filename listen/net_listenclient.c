@@ -95,6 +95,8 @@ typedef struct {
 	double UpdateTime;
 
 	Vector2 ExtrapolatedPosition;
+
+	int ownerId;
 } RemoteBullet;
 
 // The list of all possible players
@@ -226,7 +228,10 @@ void HandleSpawnBullet(ENetPacket* packet, size_t* offset)
 	int bulletId = ReadByte(packet, offset);
 	if (bulletId < 0 || bulletId >= MAX_BULLETS) return;
 
+	int ownerId = ReadByte(packet, offset);
+
 	Bullets[bulletId].Active = true;
+	Bullets[bulletId].ownerId = ownerId;
 	Bullets[bulletId].Position = ReadPosition(packet, offset);
 	Bullets[bulletId].Direction = ReadPosition(packet, offset);
 	Bullets[bulletId].UpdateTime = LastNow;
@@ -467,12 +472,13 @@ void SpawnLocalBullet(Vector2 cursorPos) {
 	enet_peer_send(server, 0, packet);
 }
 
-bool GetBulletPos(int id, Vector2* pos)
+bool GetBulletPos(int id, Vector2* pos, int* ownerId)
 {
 	if (id < 0 || id >= MAX_BULLETS || !Bullets[id].Active)
 		return false;
 
 	*pos = Bullets[id].ExtrapolatedPosition;
+	*ownerId = Bullets[id].ownerId;
 	return true;
 }
 
