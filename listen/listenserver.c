@@ -387,6 +387,18 @@ void RunServer()
 				destroy = true;
 			}
 
+			if (!destroy && ServerMapValid) {
+				int col = (int)(ServerBullets[i].x / TILE_SIZE);
+				int row = (int)(ServerBullets[i].y / TILE_SIZE);
+
+				if (col >= 0 && col < MAP_COLUMNS && row >= 0 && row < MAP_ROWS) {
+					int tileIndex = 1 + row * MAP_COLUMNS + col;
+					if (ServerMapData[tileIndex] == TILE_TYPE_ROCK) {
+						destroy = true;
+					}
+				}
+			}
+
 			if (!destroy) {
 				for (int p = 0; p < MAX_PLAYERS; p++) {
 					if (!ServerPlayers[p].Active || p == ServerBullets[i].ownerID) continue;

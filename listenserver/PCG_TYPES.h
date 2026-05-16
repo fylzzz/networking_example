@@ -1,5 +1,7 @@
 #pragma once
 
+// some network functions require these vars, but enet/winsock don't like raylib, so we can't include PCG.h
+
 #define SCREEN_WIDTH  1280
 #define SCREEN_HEIGHT 800
 #define TILE_SIZE     64

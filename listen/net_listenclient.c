@@ -225,6 +225,7 @@ void HandleUpdatePlayer(ENetPacket* packet, size_t* offset)
 	// what the input state was so the local simulation could do prediction and smooth out the motion
 }
 
+// Read bullets from server into local sim
 void HandleSpawnBullet(ENetPacket* packet, size_t* offset)
 {
 	int bulletId = ReadByte(packet, offset);
@@ -239,6 +240,7 @@ void HandleSpawnBullet(ENetPacket* packet, size_t* offset)
 	Bullets[bulletId].UpdateTime = LastNow;
 }
 
+// Remove bullet from local sim if server says so
 void HandleDestroyBullet(ENetPacket* packet, size_t* offset)
 {
 	int bulletId = ReadByte(packet, offset);
@@ -247,6 +249,7 @@ void HandleDestroyBullet(ENetPacket* packet, size_t* offset)
 	Bullets[bulletId].Active = false;
 }
 
+// Read map from server into local tileArray
 void HandleSyncMap(ENetPacket* packet, size_t* offset, TileType _tileArray[MAP_ROWS][MAP_COLUMNS]) {
 	for (int y = 0; y < MAP_ROWS; y++) {
 		for (int x = 0; x < MAP_COLUMNS; x++) {
@@ -448,53 +451,57 @@ void UpdateLocalPlayer(Vector2* movementDelta, float deltaT, TileType tileArray[
 	if (LocalPlayerId < 0)
 		return;
 
-	// add the movement to our location
-	Vector2 newPos = Vector2Add(Players[LocalPlayerId].Position, Vector2Scale(*movementDelta, deltaT));
+	Vector2 pos = Players[LocalPlayerId].Position;
 
-	// make sure we are in bounds.
-	// In a real game both the client and the server would do this to help prevent cheaters
-	if (newPos.x < 0)
-		newPos.x = 0;
+	// try X axis independently
+	Vector2 newPosX = { pos.x + movementDelta->x * deltaT, pos.y };
+	if (newPosX.x < 0) newPosX.x = 0;
+	if (newPosX.x > FieldSizeWidth - PlayerSize) newPosX.x = FieldSizeWidth - PlayerSize;
 
-	if (newPos.y < 0)
-		newPos.y = 0;
-
-	if (newPos.x > FieldSizeWidth - PlayerSize)
-		newPos.x = FieldSizeWidth - PlayerSize;
-
-	if (newPos.y > FieldSizeHeight - PlayerSize)
-		newPos.y = FieldSizeHeight - PlayerSize;
-
-	Vector2 playerBounds[4] = {
-		{ newPos.x,				 newPos.y },
-		{ newPos.x + PlayerSize, newPos.y },
-		{ newPos.x,				 newPos.y + PlayerSize },
-		{ newPos.x + PlayerSize, newPos.y + PlayerSize }
+	Vector2 cornersX[4] = {
+		{ newPosX.x,              newPosX.y },
+		{ newPosX.x + PlayerSize, newPosX.y },
+		{ newPosX.x,              newPosX.y + PlayerSize },
+		{ newPosX.x + PlayerSize, newPosX.y + PlayerSize },
 	};
-
-	bool collided = false;
+	bool blockedX = false;
 	for (int i = 0; i < 4; i++) {
-		int col = (int)(playerBounds[i].x / TILE_SIZE);
-		int row = (int)(playerBounds[i].y / TILE_SIZE);
-
+		int col = (int)(cornersX[i].x / TILE_SIZE);
+		int row = (int)(cornersX[i].y / TILE_SIZE);
 		if (col < 0 || col >= MAP_COLUMNS || row < 0 || row >= MAP_ROWS) continue;
-		if (tileArray[row][col] == TILE_TYPE_ROCK) {
-			collided = true;
-			break;
-		}
+		if (tileArray[row][col] == TILE_TYPE_ROCK) { blockedX = true; break; }
 	}
+	if (!blockedX) pos.x = newPosX.x;
 
-	if (!collided) Players[LocalPlayerId].Position = newPos;
+	// try Y axis independently
+	Vector2 newPosY = { pos.x, pos.y + movementDelta->y * deltaT };
+	if (newPosY.y < 0) newPosY.y = 0;
+	if (newPosY.y > FieldSizeHeight - PlayerSize) newPosY.y = FieldSizeHeight - PlayerSize;
 
+	Vector2 cornersY[4] = {
+		{ newPosY.x,              newPosY.y },
+		{ newPosY.x + PlayerSize, newPosY.y },
+		{ newPosY.x,              newPosY.y + PlayerSize },
+		{ newPosY.x + PlayerSize, newPosY.y + PlayerSize },
+	};
+	bool blockedY = false;
+	for (int i = 0; i < 4; i++) {
+		int col = (int)(cornersY[i].x / TILE_SIZE);
+		int row = (int)(cornersY[i].y / TILE_SIZE);
+		if (col < 0 || col >= MAP_COLUMNS || row < 0 || row >= MAP_ROWS) continue;
+		if (tileArray[row][col] == TILE_TYPE_ROCK) { blockedY = true; break; }
+	}
+	if (!blockedY) pos.y = newPosY.y;
+
+	Players[LocalPlayerId].Position = pos;
 	Players[LocalPlayerId].Direction = *movementDelta;
-
-
 }
 
 void SpawnLocalBullet(Vector2 cursorPos) {
 	if (LocalPlayerId < 0)
 		return;
 
+	// get player aiming direction
 	Vector2 dir = Vector2Subtract(cursorPos, Players[LocalPlayerId].Position);
 	dir = Vector2Normalize(dir);
 
@@ -511,10 +518,14 @@ void SpawnLocalBullet(Vector2 cursorPos) {
 }
 
 void SendMapSync(TileType _tileArray[MAP_ROWS][MAP_COLUMNS]) {
+	
+	// setup buffer based on map size
 	int tileCount = MAP_ROWS * MAP_COLUMNS;
 	int bufferSize = 1 + tileCount;
 
+	// no vectors in C but want to have resizable buffer so must use malloc()
 	uint8_t* buffer = (uint8_t*)malloc(bufferSize);
+	if (buffer == NULL) return;
 	buffer[0] = (uint8_t)SyncMap;
 
 	for (int y = 0; y < MAP_ROWS; y++)
@@ -523,6 +534,7 @@ void SendMapSync(TileType _tileArray[MAP_ROWS][MAP_COLUMNS]) {
 
 	ENetPacket* packet = enet_packet_create(buffer, bufferSize, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(server, 0, packet);
+	// cleanup buffer
 	free(buffer);
 }
 
