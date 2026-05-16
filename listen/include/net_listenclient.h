@@ -53,7 +53,7 @@ void Disconnect();
 bool Connected();
 
 // Tell the network game play how far we wanted to move this frame
-void UpdateLocalPlayer(Vector2* movementDelta, float deltaT);
+void UpdateLocalPlayer(Vector2* movementDelta, float deltaT, TileType tileArray[MAP_ROWS][MAP_COLUMNS]);
 
 void SpawnLocalBullet(Vector2 cursorPos);
 bool GetBulletPos(int id, Vector2* pos, int* ownerId);

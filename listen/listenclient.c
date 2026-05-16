@@ -142,7 +142,7 @@ void UpdateGame()
 
 			// tell the network game play client that we moved
 			// it will update the local simulation and cache the data until the next network tick time
-			UpdateLocalPlayer(&movement, GetFrameTime());
+			UpdateLocalPlayer(&movement, GetFrameTime(), tileArray);
 
 			if (IsMouseButtonPressed(0)) {
 				SpawnLocalBullet(GetMousePosition());

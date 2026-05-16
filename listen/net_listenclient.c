@@ -442,28 +442,49 @@ int GetLocalPlayerId()
 }
 
 // add the input to our local position and make sure we are still inside the field
-void UpdateLocalPlayer(Vector2* movementDelta, float deltaT)
+void UpdateLocalPlayer(Vector2* movementDelta, float deltaT, TileType tileArray[MAP_ROWS][MAP_COLUMNS])
 {
 	// if we are not accepted, we can't update
 	if (LocalPlayerId < 0)
 		return;
 
 	// add the movement to our location
-	Players[LocalPlayerId].Position = Vector2Add(Players[LocalPlayerId].Position, Vector2Scale(*movementDelta, deltaT));
+	Vector2 newPos = Vector2Add(Players[LocalPlayerId].Position, Vector2Scale(*movementDelta, deltaT));
 
 	// make sure we are in bounds.
 	// In a real game both the client and the server would do this to help prevent cheaters
-	if (Players[LocalPlayerId].Position.x < 0)
-		Players[LocalPlayerId].Position.x = 0;
+	if (newPos.x < 0)
+		newPos.x = 0;
 
-	if (Players[LocalPlayerId].Position.y < 0)
-		Players[LocalPlayerId].Position.y = 0;
+	if (newPos.y < 0)
+		newPos.y = 0;
 
-	if (Players[LocalPlayerId].Position.x > FieldSizeWidth - PlayerSize)
-		Players[LocalPlayerId].Position.x = FieldSizeWidth - PlayerSize;
+	if (newPos.x > FieldSizeWidth - PlayerSize)
+		newPos.x = FieldSizeWidth - PlayerSize;
 
-	if (Players[LocalPlayerId].Position.y > FieldSizeHeight - PlayerSize)
-		Players[LocalPlayerId].Position.y = FieldSizeHeight - PlayerSize;
+	if (newPos.y > FieldSizeHeight - PlayerSize)
+		newPos.y = FieldSizeHeight - PlayerSize;
+
+	Vector2 playerBounds[4] = {
+		{ newPos.x,				 newPos.y },
+		{ newPos.x + PlayerSize, newPos.y },
+		{ newPos.x,				 newPos.y + PlayerSize },
+		{ newPos.x + PlayerSize, newPos.y + PlayerSize }
+	};
+
+	bool collided = false;
+	for (int i = 0; i < 4; i++) {
+		int col = (int)(playerBounds[i].x / TILE_SIZE);
+		int row = (int)(playerBounds[i].y / TILE_SIZE);
+
+		if (col < 0 || col >= MAP_COLUMNS || row < 0 || row >= MAP_ROWS) continue;
+		if (tileArray[row][col] == TILE_TYPE_ROCK) {
+			collided = true;
+			break;
+		}
+	}
+
+	if (!collided) Players[LocalPlayerId].Position = newPos;
 
 	Players[LocalPlayerId].Direction = *movementDelta;
 
