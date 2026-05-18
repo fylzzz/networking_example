@@ -55,6 +55,8 @@ typedef struct
 
 	int16_t DX;
 	int16_t DY;
+
+	int16_t Health;
 }PlayerInfo;
 
 typedef struct {
@@ -412,6 +414,20 @@ void RunServer()
 						by >= py && by <= py + PlayerSize)
 					{
 						destroy = true;
+
+						ServerPlayers[p].Health -= 1;
+
+						uint8_t buffer[4] = { 0 };
+						buffer[0] = (uint8_t)DamagePlayer;
+						buffer[1] = (uint8_t)p;
+						*(uint16_t*)(buffer + 2) = ServerPlayers[p].Health;
+
+						ENetPacket* packet = enet_packet_create(buffer, 5, ENET_PACKET_FLAG_RELIABLE);
+						enet_host_broadcast(server, 0, packet);
+
+						if (ServerPlayers[p].Health <= 0) {
+							enet_peer_disconnect(ServerPlayers[p].Peer, 0);
+						}
 						break;
 					}
 				}

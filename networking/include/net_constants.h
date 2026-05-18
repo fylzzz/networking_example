@@ -66,4 +66,6 @@ typedef enum
 	DestroyBullet = 7,
 
 	SyncMap = 8,
+
+	DamagePlayer = 9,
 }NetworkCommands;

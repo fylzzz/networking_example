@@ -194,6 +194,7 @@ void DrawGame()
 			if (GetPlayerPos(i, &pos))
 			{
 				DrawRectangle((int)pos.x, (int)pos.y, PlayerSize, PlayerSize, PlayerColors[i]);
+				DrawText(TextFormat("%d", GetPlayerHealth(i)), (int)pos.x, (int)pos.y - 15, 12, PlayerColors[i]);
 			}
 		}
 

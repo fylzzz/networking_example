@@ -85,6 +85,8 @@ typedef struct
 
 	//where we think this item is right now based on the movement vector
 	Vector2 ExtrapolatedPosition;
+
+	int Health;
 }RemotePlayer;
 
 typedef struct {
@@ -191,6 +193,7 @@ void HandleAddPlayer(ENetPacket* packet, size_t* offset)
 	Players[remotePlayer].Position = ReadPosition(packet, offset);
 	Players[remotePlayer].Direction = ReadPosition(packet, offset);
 	Players[remotePlayer].UpdateTime = LastNow;
+	Players[remotePlayer].Health = 3;
 
 	// In a more robust game, this message would have more info about the new player, such as what sprite or model to use, player name, or other data a client would need
 	// this is where static data about the player would be sent, and any initial state needed to setup the local simulation
@@ -256,6 +259,13 @@ void HandleSyncMap(ENetPacket* packet, size_t* offset, TileType _tileArray[MAP_R
 			_tileArray[y][x] = (TileType)ReadByte(packet, offset);
 		}
 	}
+}
+
+void HandleDamagePlayer(ENetPacket* packet, size_t* offset) {
+	int targetID = ReadByte(packet, offset);
+	if (targetID < 0 || targetID >= MAX_PLAYERS) return;
+
+	Players[targetID].Health = ReadShort(packet, offset);
 }
 
 // process one frame of updates
@@ -344,6 +354,7 @@ void Update(double now, float deltaT, TileType _tileArray[MAP_ROWS][MAP_COLUMNS]
 					// and then the server tells us where we are
 					// But for this simple test, everyone starts at the same place on the field
 					Players[LocalPlayerId].Position = (Vector2){ 100, 100 };
+					Players[LocalPlayerId].Health = 3;
 				}
 			}
 			else // we have been accepted, so process play messages from the server
@@ -373,6 +384,9 @@ void Update(double now, float deltaT, TileType _tileArray[MAP_ROWS][MAP_COLUMNS]
 
 				case SyncMap:
 					HandleSyncMap(Event.packet, &offset, _tileArray);
+					break;
+				case DamagePlayer:
+					HandleDamagePlayer(Event.packet, &offset);
 					break;
 				}
 
@@ -561,6 +575,11 @@ bool GetPlayerPos(int id, Vector2* pos)
 	else
 		*pos = Players[id].ExtrapolatedPosition;
 	return true;
+}
+
+int GetPlayerHealth(int id) {
+	if (id < 0 || id >= MAX_PLAYERS) return 0;
+	return Players[id].Health;
 }
 
 bool IsHost() {

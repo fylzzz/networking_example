@@ -66,6 +66,7 @@ void SendMapSync(TileType _tileArray[MAP_ROWS][MAP_COLUMNS]);
 // get the position info for a player from the local simulation that has the latest network data in it
 // returns false if the player id is not valid
 bool GetPlayerPos(int id, Vector2* pos);
+int GetPlayerHealth(int id);
 
 bool IsHost();
 
